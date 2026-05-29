@@ -138,8 +138,23 @@ export PATH="$HOME/.dotnet/tools:$PATH"
 4. (如果還是不行，可直接指向實體路徑：`~/.asdf/installs/dotnet-core/10.0.100/dotnet`)
 
 ### 4. 環境變數設定 (`DOTNET_ROOT`)
-部分工具或語言伺服器 (Language Server) 依賴 `DOTNET_ROOT` 變數來尋找 SDK。您可以在 `~/.zshrc` 補上：
+部分工具或語言伺服器 (Language Server) 依賴 `DOTNET_ROOT` 變數來尋找 SDK。您有兩種方式可以設定這個變數，請根據您的使用情境選擇：
+
+#### 方案 A：動態切換路徑 (推薦方案)
+為了讓 `DOTNET_ROOT` 能夠在您切換目錄時動態更新，推薦使用 `asdf-dotnet-core` 官方提供的動態切換腳本。請在您的 `~/.zshrc` 或 `~/.bash_profile` 中加入：
+```bash
+# zsh 使用者
+. ~/.asdf/plugins/dotnet-core/set-dotnet-home.zsh
+
+# bash 使用者
+# . ~/.asdf/plugins/dotnet-core/set-dotnet-home.bash
+```
+* **優點**：加入後，每當您使用 `cd` 切換專案目錄時，腳本會自動偵測該目錄下的 `.tool-versions`，並即時更新 `DOTNET_ROOT`。這樣無論終端機還是 IDE 啟動時，都能精準對應到專案專屬的 SDK 版本。
+*(注意：設定完成後，記得執行 `source ~/.zshrc` 讓變數生效)*
+
+#### 方案 B：靜態寫死全域路徑
+如果您多數時候只使用一個固定的全域 .NET 版本，也可以在 `~/.zshrc` 或 `~/.bash_profile` 中寫死路徑：
 ```bash
 export DOTNET_ROOT="$HOME/.asdf/installs/dotnet-core/$(asdf current dotnet-core | awk '{print $2}')"
 ```
-*(注意：若切換版本，此變數在開新終端機後才會抓到最新路徑)*
+* **缺點**：因為 `.zshrc` 只有在開啟新終端機時會載入一次，這行指令只會抓取當時的預設版本。如果您在不同專案使用 `asdf local` 切換 .NET 版本，IDE 或其他工具可能會因為 `DOTNET_ROOT` 沒有動態更新而抓錯 SDK。
