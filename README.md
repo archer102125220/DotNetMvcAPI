@@ -37,4 +37,14 @@ http://localhost:<您的port>/swagger
 您可以選擇以下任一編輯器來開發此專案：
 - **Visual Studio Code** (推薦安裝 C# Dev Kit 擴充功能)
 - **JetBrains Rider**
+- **Visual Studio (Windows)**
 - ~~**Visual Studio for Mac**~~ (微軟已停止支援，建議改用 VS Code 或 Rider)
+
+## 跨平台開發：使用 Visual Studio (Windows) 開啟注意事項
+
+由於本專案是透過 `.NET CLI` 建立，如果您在 Windows 平台上使用一般的 Visual Studio 應用程式開啟此專案，請注意以下幾點：
+
+1. **方案檔 (.sln)**：
+   CLI 建立專案時預設只產生了專案檔 (`.csproj`) 而沒有方案檔 (`.sln`)。在 Visual Studio 中，請直接點選「開啟專案或方案」，並選取 `DotNetMvcAPI.csproj`。Visual Studio 開啟後會在您儲存時自動產生對應的 `.sln` 方案檔。
+2. **啟動設定檔 (Launch Profile)**：
+   在 Windows 的 Visual Studio 中，預設的啟動選項通常會是 `IIS Express`。為了與跨平台 CLI 環境下 (`dotnet run`) 的執行行為 (使用 Kestrel 伺服器) 保持一致，建議您在上方啟動按鈕的下拉選單中，將啟動選項切換為專案名稱 (**DotNetMvcAPI**)。

@@ -37,4 +37,14 @@ Through the Swagger UI, you can easily view all API endpoints and test them.
 You can choose any of the following editors to develop this project:
 - **Visual Studio Code** (C# Dev Kit extension recommended)
 - **JetBrains Rider**
+- **Visual Studio (Windows)**
 - ~~**Visual Studio for Mac**~~ (Retired by Microsoft; using VS Code or Rider is recommended)
+
+## Cross-Platform Development: Notes on using Visual Studio (Windows)
+
+Since this project was generated using the `.NET CLI`, if you are opening this project on Windows using the standard Visual Studio application, please keep the following in mind:
+
+1. **Solution File (.sln)**:
+   By default, the CLI might only generate a project file (`.csproj`) without a solution file (`.sln`). In Visual Studio, simply select "Open a project or solution" and choose `DotNetMvcAPI.csproj`. Visual Studio will automatically generate the corresponding `.sln` file for you when you save the project.
+2. **Launch Profile**:
+   When opened in Visual Studio on Windows, the default launch profile is usually set to `IIS Express`. To remain consistent with the execution behavior in cross-platform CLI environments (`dotnet run`), which uses the Kestrel server, it is highly recommended to change the launch profile from the dropdown menu in the top toolbar to the project name (**DotNetMvcAPI**).
