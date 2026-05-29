@@ -5,6 +5,31 @@
 ## 專案簡介
 本專案的主要目的是作為學習 .NET API 開發的練習場。在這裡可以學習和測試如何建立 RESTful API、設計 Controller、處理 Model 等後端開發技巧。
 
+## MVC API vs Minimal API
+
+在 .NET 建立 Web API 專案時，主要有兩種架構可以選擇：**MVC API (Controllers)** 與 **Minimal API**。
+
+- **MVC API (基於 Controller)**：
+  這是 .NET 傳統且經典的 API 開發模式。它採用 Model-View-Controller 架構理念（雖然在 API 中通常沒有 View）。您會建立繼承自 `ControllerBase` 的類別，透過路由屬性 (Routing Attributes) 定義端點。這種模式提供了完整的生命週期、過濾器 (Filters)、模型綁定 (Model Binding) 以及依賴注入。
+- **Minimal API**：
+  這是較新的輕量級開發模式，旨在以最少的程式碼與樣板檔案建立 HTTP API。您可以在 `Program.cs` 檔案中直接使用 `app.MapGet()`, `app.MapPost()` 等方法定義路由與處理邏輯。它效能極佳，且適合微服務或簡單的小型 API。
+
+### 什麼時候適用 MVC API？
+- **大型專案與企業級應用**：當專案規模龐大，API 數量眾多時，基於 Controller 的結構能讓程式碼更容易被組織、分類和維護。
+- **需要複雜的過濾器 (Filters) 與中介軟體 (Middleware)**：如果您的端點需要共用複雜的授權、驗證或例外處理邏輯。
+- **既有團隊的習慣**：如果開發團隊已經非常熟悉傳統的 ASP.NET Core MVC 架構，使用 Controller 可以無縫銜接。
+- **需要完整的版本控制 (Versioning) 與 API 文件生成 (Swagger) 高階整合**：MVC 在這些進階功能的支援上通常更為成熟且開箱即用。
+
+## 建立 MVC API 專案的指令
+
+若您想從頭建立一個與本專案類似的 MVC API 專案，可以使用以下 .NET CLI 指令：
+
+```bash
+# 建立一個名為 MyMvcApiProject 的 Web API 專案 (預設使用 Controller 架構)
+dotnet new webapi -n MyMvcApiProject --use-controllers
+```
+*(備註：在較新的 .NET SDK 版本中，預設的 `webapi` 範本可能會使用 Minimal API，透過加上 `--use-controllers` 參數可以強制建立基於 Controller 的 MVC API 專案)*
+
 ## 環境要求
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download) (或專案對應版本的 .NET SDK)
 
