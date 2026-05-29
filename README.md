@@ -45,8 +45,15 @@ dotnet new webapi -n MyMvcApiProject --use-controllers
    cd /Users/parkerchen/Desktop/code/DotNetMvcAPI
    ```
 3. **執行專案**：
+   - **一般執行模式：**
    ```bash
    dotnet run
+   ```
+
+   - **開發者模式 (熱重載 Hot Reload)：**
+   （推薦使用此模式，當你修改程式碼並存檔時，API 伺服器會自動重新載入，無須手動重啟）
+   ```bash
+   dotnet watch run
    ```
 
 ### 啟動後的存取方式

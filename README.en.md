@@ -45,8 +45,15 @@ To start this project, please follow these steps:
    cd /Users/parkerchen/Desktop/code/DotNetMvcAPI
    ```
 3. **Run the project**:
+   - **Normal Run Mode:**
    ```bash
    dotnet run
+   ```
+
+   - **Developer Mode (Hot Reload):**
+   (Recommended for development. When you modify and save the code, the API server will automatically reload without requiring a manual restart.)
+   ```bash
+   dotnet watch run
    ```
 
 ### Accessing the Application
