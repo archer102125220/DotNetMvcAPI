@@ -52,11 +52,13 @@ dotnet new webapi -n MyMvcApiProject --use-controllers
 ### 啟動後的存取方式
 專案成功啟動後，終端機會顯示伺服器正在監聽的 URL (例如：`http://localhost:5xxx`)。
 
-在開發環境 (Development) 下，專案預設啟用了 Swagger。您可以打開瀏覽器，前往：
+在開發環境 (Development) 下，專案預設啟用了 Scalar 做為 API 文件。您可以打開瀏覽器，前往：
 ```
-http://localhost:<您的port>/swagger
+http://localhost:<您的port>/scalar/v1
 ```
-透過 Swagger UI，您可以方便地查看所有的 API 介面並進行測試。
+透過 Scalar UI，您可以方便地查看所有的 API 介面並進行測試。
+
+> 註：由於這是一個純 API 專案，根目錄 (`/`) 預設不會有任何網頁內容，因此直接訪問 `http://localhost:<您的port>/` 會顯示 404 找不到網頁，請直接訪問 API 路由或 `/scalar/v1`。
 
 ## 開發工具推薦
 您可以選擇以下任一編輯器來開發此專案：

@@ -52,11 +52,13 @@ To start this project, please follow these steps:
 ### Accessing the Application
 Once the project successfully starts, the terminal will display the URL the server is listening on (e.g., `http://localhost:5xxx`).
 
-In the Development environment, Swagger is enabled by default. You can open your browser and go to:
+In the Development environment, Scalar is enabled by default as the API documentation client. You can open your browser and go to:
 ```
-http://localhost:<your_port>/swagger
+http://localhost:<your_port>/scalar/v1
 ```
-Through the Swagger UI, you can easily view all API endpoints and test them.
+Through the Scalar UI, you can easily view all API endpoints and test them.
+
+> Note: Because this is a pure API project, there is no default web page at the root path (`/`). Visiting `http://localhost:<your_port>/` directly will result in a 404 Not Found. Please visit the API routes directly or navigate to `/scalar/v1`.
 
 ## Recommended Development Tools
 You can choose any of the following editors to develop this project:
