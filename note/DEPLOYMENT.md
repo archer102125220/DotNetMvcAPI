@@ -105,6 +105,38 @@ docker build -t dotnetmvcapi-app .
 # 執行 Docker 容器 (將主機的 8080 Port 對應到容器的 80 Port)
 docker run -d -p 8080:80 --name my-mvc-api dotnetmvcapi-app
 ```
+### 選項 D：部署至 Windows IIS (Windows 環境推薦)
+
+在 Windows 伺服器上，IIS (Internet Information Services) 是最標準且強大的網頁伺服器，負責管理應用程式集區 (App Pools) 與請求轉發。
+
+1. **安裝環境**：
+   * 在伺服器上安裝 **.NET Hosting Bundle** (請確保版本與專案一致)。這會同時安裝 .NET Runtime 以及 IIS 整合模組 (ASP.NET Core Module v2)。
+   * 安裝完成後，建議重新啟動 IIS (於 CMD 執行 `iisreset`)。
+2. **準備發布檔案**：
+   * 將 `./publish` 資料夾內的檔案複製到伺服器 (例如 `C:\inetpub\wwwroot\DotNetMvcAPI`)。
+3. **設定 IIS**：
+   * 開啟 **IIS 管理員**。
+   * 新增一個 **應用程式集區 (Application Pool)**，將 **.NET CLR 版本**設定為 **無 Managed 程式碼 (No Managed Code)** (因為 .NET Core/5+ 是獨立運作的，IIS 僅作為反向代理)。
+   * **新增網站**或在現有網站下**新增應用程式**，實體路徑指向剛才複製的發布資料夾。
+   * 將此網站指派給剛建立的應用程式集區。
+4. **權限設定**：確保應用程式集區身分 (例如 `IIS AppPool\YourAppPoolName`) 對該資料夾擁有**讀取**與**執行**權限。若有檔案寫入需求，也需賦予寫入權限。
+
+### 選項 E：部署為 Windows Service (適合背景執行的 API)
+
+如果不需要 IIS 的完整網頁伺服器功能，將應用程式註冊為 Windows 服務也是一種輕量且能隨系統自動啟動的做法。
+
+1. **修改程式碼支援服務 (若專案尚未支援)**：
+   * 在專案中安裝 NuGet 套件：`Microsoft.Extensions.Hosting.WindowsServices`
+   * 修改 `Program.cs`，在 `builder.Build()` 之前加入：`builder.Host.UseWindowsService();`
+   * 重新發布專案以產生新的 `.exe` 檔。
+2. **註冊服務**：
+   * 開啟系統管理員權限的命令提示字元 (CMD) 或 PowerShell。
+   * 執行以下 `sc create` 指令建立服務 (注意：`binPath=` 等號後面**必須**有一個空格)：
+     ```cmd
+     sc create "DotNetMvcAPI" binPath= "C:\你的部署路徑\DotNetMvcAPI.exe" start= auto
+     ```
+3. **啟動服務**：
+   * 執行 `sc start "DotNetMvcAPI"`，或是開啟 Windows 的「服務 (services.msc)」介面來啟動並檢查狀態。
 
 ## 3. 環境設定 (Environment Variables)
 
