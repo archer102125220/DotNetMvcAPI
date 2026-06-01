@@ -1,4 +1,4 @@
-# .NET MVC 專案：Docker 服務環境與資料庫初始化教學
+# .NET Web API 專案：Docker 服務環境與資料庫初始化教學
 
 這份文件記錄了本專案 `docker/` 資料夾下的服務架構。這些資料庫環境**主要是以學習與測試不同資料庫操作為目的而建立的**。專案目前規劃**預設會以 MSSQL (Microsoft SQL Server) 作為主要使用的資料庫**，因此本文件特別針對 MSSQL 的快速建立與自動初始化進行了詳細說明。
 
@@ -88,6 +88,6 @@ docker-compose up -d
 ---
 
 ## 💡 開發注意事項
-- 在 `.NET MVC` 的 `appsettings.json` 中設定連線字串 (Connection String) 時，請參考上方表格中的對外 Port、帳號與密碼，**不要**使用高權限管理員帳號 (`sa`, `root`, `postgres`)。
+- 在 `.NET Web API` 的 `appsettings.json` 中設定連線字串 (Connection String) 時，請參考上方表格中的對外 Port、帳號與密碼，**不要**使用高權限管理員帳號 (`sa`, `root`, `postgres`)。
   - MSSQL 範例：`Server=localhost,1434;Database=DotNetMvcDb;User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;TrustServerCertificate=True;`
 - 專案程式碼如果需要依賴新的資料庫欄位或表，應優先透過 EF Core 的 Migrations (`dotnet ef migrations add ...`) 來處理，盡量不要手動去改 `init.sql`，`init.sql` 僅負責「基礎環境與權限」的建置。

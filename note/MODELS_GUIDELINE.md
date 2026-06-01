@@ -1,4 +1,4 @@
-# ASP.NET Core MVC: 資料模型 (Models) 與 EF Core 開發指南
+# ASP.NET Core Web API: 資料模型 (Models) 與 EF Core 開發指南
 
 本指南整合了專案中關於 Entity Framework Core (EF Core) 的安裝設定、資料模型 (`Models` 目錄) 的結構規範，以及深度檢查政策 (Deep Check Policy)。為維持專案架構清晰、安全且高效，請所有開發者嚴格遵守。
 
@@ -50,7 +50,7 @@ dotnet add package Oracle.EntityFrameworkCore
 ```csharp
 using Microsoft.EntityFrameworkCore;
 
-namespace DotNetMvcWeb.Data;
+namespace DotNetMvcAPI.Data;
 
 public class AppDbContext : DbContext
 {
@@ -68,7 +68,7 @@ public class AppDbContext : DbContext
 在 `Program.cs` 檔案中，將 `AppDbContext` 註冊至依賴注入容器中：
 ```csharp
 using Microsoft.EntityFrameworkCore;
-using DotNetMvcWeb.Data;
+using DotNetMvcAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,43 +108,41 @@ var app = builder.Build();
 ### 1. `Entities/` (實體模型)
 - **用途**：代表資料庫的資料表結構，與 EF Core 直接對應。
 - **規則**：
-  - **絕對不可以**直接將 Entity 傳遞給 Razor Views (`.cshtml`)，這會導致敏感資料（如密碼、雜湊值）外洩或引發 Lazy-Loading 的效能問題。
+  - **絕對不可以**直接將 Entity 回傳給 API 客戶端，這會導致敏感資料（如密碼、雜湊值）外洩或引發 JSON 遞迴序列化問題。
   - 僅在 `Data` (DbContext) 或 `Services` 層級中進行操作。
 
-### 2. `ViewModels/` (視圖模型)
-- **用途**：專門為 Razor Views (`.cshtml`) 設計的強型別資料結構。
+### 2. `DTOs/` (資料傳輸物件)
+- **用途**：專門用於 API 請求與回應，以及 Service 層與 Controller 層之間的資料傳遞。
 - **規則**：
-  - 每個 View 建議有自己專屬的 ViewModel（例如 `UserLoginViewModel`）。
-  - View 中需要顯示什麼欄位，ViewModel 就只提供什麼欄位。
-  - 可以在屬性上加入資料驗證標籤（Data Annotations）進行表單驗證。
-
-### 3. `DTOs/` (資料傳輸物件)
-- **用途**：用於前後端 API 呼叫、微服務通訊，或是 Service 層與 Controller 層之間的資料傳遞。
-- **規則**：
+  - **永遠不要**將 Entity 直接當作請求或回應。
+  - 每個 API 端點建議有專屬的 DTO（例如 `UserRegisterRequest`, `UserProfileResponse`）。
   - 結構應保持扁平，僅包含傳輸所需的純資料。
+  - 可以在屬性上加入資料驗證標籤（Data Annotations）進行 API 的輸入驗證。
 
 ---
 
-## 🛡️ 第三部分：核心開發規範 (Controller-ViewModel 模式)
+## 🛡️ 第三部分：核心開發規範 (Controller-DTO 模式)
 
 ### 1. Thin Controllers 模式
-- **Always use ViewModels**：Controller 的職責是從 Service 取得資料 (Entity / DTO)，將其轉換為 ViewModel，然後傳遞給 View。
+- **Always use DTOs**：Controller 的職責是從 Service 取得資料 (Entity / 內部 DTO)，將其轉換為對外的 Response DTO，然後回傳。
 - ❌ **錯誤示範**：直接回傳資料庫實體
   ```csharp
-  public async Task<IActionResult> Profile() {
-      User user = await _dbContext.Users.FindAsync(userId);
-      return View(user); // ❌ 危險！可能外洩機密資料
+  [HttpGet("{userId}")]
+  public async Task<IActionResult> Profile(int userId) {
+      User? user = await _dbContext.Users.FindAsync(userId);
+      return Ok(user); // ❌ 危險！可能外洩機密資料，且易引發 JSON 序列化遞迴問題
   }
   ```
-- ✅ **正確示範**：轉換為 ViewModel
+- ✅ **正確示範**：轉換為 DTO
   ```csharp
-  public async Task<IActionResult> Profile() {
+  [HttpGet("{userId}")]
+  public async Task<IActionResult> Profile(int userId) {
       var user = await _userService.GetUserAsync(userId);
-      var viewModel = new UserProfileViewModel {
+      var dto = new UserProfileResponse {
           Username = user.Username,
           Email = user.Email
       };
-      return View(viewModel); // ✅ 安全
+      return Ok(dto); // ✅ 安全
   }
   ```
 
@@ -158,13 +156,13 @@ var app = builder.Build();
   ```
 
 ### 3. 執行時期資料驗證 (Runtime Data Validation)
-在 `ViewModels` 或 `DTOs` 中，善用 Data Annotations 搭配 Controller 中的 `ModelState.IsValid` 進行後端防護。
+在 `DTOs` 中，善用 Data Annotations 搭配 `[ApiController]` 提供的自動 `ModelState` 檢查進行後端防護。
 - 字串檢查：優先使用 `string.IsNullOrEmpty()` 或 `string.IsNullOrWhiteSpace()`。
 - 驗證標籤範例：
   ```csharp
   using System.ComponentModel.DataAnnotations;
 
-  public class UserRegisterViewModel
+  public class UserRegisterRequest
   {
       [Required(ErrorMessage = "使用者名稱為必填")]
       [StringLength(50, MinimumLength = 3, ErrorMessage = "長度必須在 3 到 50 個字元之間")]
@@ -178,7 +176,6 @@ var app = builder.Build();
 
 ### 4. 避免動態與弱型別
 - **嚴禁使用** `dynamic` 或 `object`（除非必須使用 Reflection 或處理未知結構的 JSON）。
-- 避免在 View 中使用 `ViewBag` 或 `ViewData` 來傳遞複雜資料，一律使用強型別的 ViewModel。
 
 ---
 
@@ -233,9 +230,9 @@ public async Task<List<User>> GetActiveUsersAsync()
 
 ## 🎯 總結檢查清單 (Checklist)
 - [ ] 專案已確實安裝與設定 EF Core，並於 `Program.cs` 中註冊 DbContext。
-- [ ] 實體 (Entity) 是否被隔離，沒有直接傳遞給 View？
-- [ ] ViewModel 的命名是否明確且針對特定的 View？
+- [ ] 實體 (Entity) 是否被隔離，沒有直接回傳給 API 客戶端？
+- [ ] DTO 的命名是否明確 (例如加上 Request/Response 後綴)？
 - [ ] 屬性的 Nullable (`?`) 標示是否精確？
-- [ ] 是否已經為表單 ViewModel 加上了適當的 `[Required]` 等驗證標籤？
+- [ ] 是否已經為 Request DTO 加上了適當的 `[Required]` 等驗證標籤？
 - [ ] 所有 EF Core 查詢是否都採用非同步 (`await`)？
 - [ ] 唯讀的查詢是否都加上了 `.AsNoTracking()`？

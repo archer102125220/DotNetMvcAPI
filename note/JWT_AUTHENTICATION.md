@@ -1,6 +1,6 @@
 # JWT 驗證與 System.IdentityModel.Tokens.Jwt 教學筆記
 
-這份筆記記錄了如何在 .NET (特別是 ASP.NET Core MVC / Web API) 專案中引入 `System.IdentityModel.Tokens.Jwt` 套件，以及如何實作基於 JSON Web Token (JWT) 的驗證機制。
+這份筆記記錄了如何在 .NET (特別是 ASP.NET Core Web API) 專案中引入 `System.IdentityModel.Tokens.Jwt` 套件，以及如何實作基於 JSON Web Token (JWT) 的驗證機制。
 
 ## 1. 簡介
 
