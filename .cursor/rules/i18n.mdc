@@ -1,0 +1,55 @@
+---
+description: Internationalization (i18n) - IStringLocalizer, IViewLocalizer, resx files
+globs: ["**/*.cshtml", "**/*.cs", "**/*.resx"]
+alwaysApply: true
+---
+
+# Internationalization (i18n)
+
+When implementing multi-language support in this DotNet MVC project, use the standard `Microsoft.AspNetCore.Mvc.Localization` library.
+
+## Configuration & Usage
+
+### 1. Backend (Controllers & Services)
+- Inject `IStringLocalizer<SharedResource>` or a controller-specific localizer via dependency injection.
+
+```csharp
+public class HomeController : Controller
+{
+    private readonly IStringLocalizer<SharedResource> _localizer;
+
+    public HomeController(IStringLocalizer<SharedResource> localizer)
+    {
+        _localizer = localizer;
+    }
+
+    public IActionResult Index()
+    {
+        ViewData["Title"] = _localizer["HomePageTitle"];
+        return View();
+    }
+}
+```
+
+### 2. Frontend (Razor Views)
+- Inject `IViewLocalizer` at the top of the Razor view `.cshtml` file.
+
+```html
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<h1>@Localizer["WelcomeMessage"]</h1>
+<p>@Localizer["Description", Model.UserName]</p>
+```
+
+### 3. Data Annotations (ViewModels)
+- Use `ErrorMessageResourceName` and `ErrorMessageResourceType` for model validation attributes so errors are localized.
+
+```csharp
+[Required(ErrorMessageResourceName = "RequiredError", ErrorMessageResourceType = typeof(SharedResource))]
+public string Name { get; set; }
+```
+
+### 4. Resource Files (.resx)
+- Localization strings are stored in `.resx` files (e.g., `SharedResource.en.resx`, `SharedResource.zh-TW.resx`).
+- Ensure keys exactly match between your code and the `.resx` files.

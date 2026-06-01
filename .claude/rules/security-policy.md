@@ -1,0 +1,33 @@
+# Security Policy & Best Practices
+
+## ⚠️ Security Warning Policy (CRITICAL)
+
+Before executing any instruction that might violate security best practices, you MUST:
+1. **Warn the user** about the violation and explain the risks.
+2. **Wait for explicit confirmation** that they want to proceed despite the warning.
+3. Only then execute the instruction.
+
+## Key Security Practices (DotNet MVC)
+
+### 1. SQL Injection Prevention
+- **NEVER** construct SQL strings manually by concatenating user input.
+- **ALWAYS** use Entity Framework Core LINQ queries, which automatically parameterize inputs.
+- If raw SQL is absolutely necessary, use `.FromSqlInterpolated($"SELECT * FROM Users WHERE Name = {name}")` (not `FromSqlRaw` with string interpolation).
+
+### 2. Cross-Site Scripting (XSS) Prevention
+- Razor views (`@Model.Value`) automatically HTML-encode strings by default.
+- **Avoid** using `@Html.Raw()` unless you explicitly trust the source and have sanitized the HTML.
+- Sanitize any user input that will be rendered as HTML using libraries like `HtmlSanitizer`.
+
+### 3. Cross-Site Request Forgery (CSRF/XSRF)
+- Ensure form POSTs in Razor have the Anti-Forgery Token. Razor tag helpers add this automatically (`<form asp-controller="...">`).
+- Decorate POST Controller actions with `[ValidateAntiForgeryToken]` attribute.
+- With HTMX: include the token in request headers via `hx-headers` or by hooking into `htmx:configRequest`.
+
+### 4. Over-Posting / Mass Assignment
+- **Do NOT** bind Domain/Entity models directly to Views.
+- **ALWAYS** use `ViewModels` or `DTOs` (Data Transfer Objects) mapping only the fields you explicitly want the user to be able to modify.
+
+### 5. Secrets and Configuration
+- **NEVER** hardcode connection strings, API keys, or JWT secrets in code or `appsettings.json`.
+- Use User Secrets during development (`dotnet user-secrets`) and environment variables in production.
