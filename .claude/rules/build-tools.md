@@ -1,4 +1,4 @@
-# Build & Dev Tooling
+# .NET Build & Dev Tooling
 
 This project uses the standard .NET CLI (`dotnet`) for all build, development, and execution tasks.
 

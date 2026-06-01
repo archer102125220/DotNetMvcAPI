@@ -1,6 +1,6 @@
-# Runtime Data Validation (Strict C#)
+# Runtime Null & Data Validation
 
-To ensure robustness, always use strict type checks and appropriate built-in C# methods for validation.
+Always validate data correctly at runtime, especially when dealing with data crossing the boundary from client (HTMX/Forms) to server (Controllers).
 
 ### 1. String Validation
 - **Do NOT** use: `if (str == "")` or length checks.

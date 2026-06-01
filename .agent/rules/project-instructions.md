@@ -1,13 +1,14 @@
-# Project Instructions (DotNet MVC)
+# Project Instructions (DotNet Web API)
 
 This document defines the coding standards and rules for AI agents working on this project.
+**Project Scope**: This is a pure ASP.NET Core Web API project. It DOES NOT contain Razor Views, HTMX, frontend styles, or static assets.
 
 ## Core Principles
 
 1. **C# Safety**: Strongly typed, avoid `dynamic`, use `<Nullable>enable</Nullable>`.
 2. **ORM Patterns**: Use Entity Framework Core (EF Core) with Code-First approach.
-3. **Frontend Stack**: Use Razor Views (`.cshtml`) + HTMX for interactivity.
-4. **i18n**: Use native `Microsoft.AspNetCore.Mvc.Localization` (`IStringLocalizer`, `IViewLocalizer`).
+3. **API Design**: RESTful architecture, use Data Transfer Objects (DTOs), NEVER return EF entities directly.
+4. **Documentation**: Use XML Comments and OpenAPI (Swagger/Scalar) for API documentation.
 5. **Tooling**: Use `dotnet CLI` (`dotnet run`, `dotnet watch`).
 
 ## Security Policy
@@ -37,12 +38,6 @@ Before ANY database schema change, you MUST:
    - Not deployed: May modify the unapplied migration directly or recreate DB.
    - Deployed: NEVER modify existing migrations; create NEW files.
 
-## Razor & HTMX Policy:
-- Prioritize **HTMX** for dynamic partial page updates without full page reloads.
-- Use `hx-get`, `hx-post`, `hx-swap="outerHTML"`, `hx-target` to load `PartialView`s from the server.
-- Return `PartialView()` from the Controller if the request is an HTMX request (`Request.Headers.ContainsKey("HX-Request")`).
-- Heavy, complex view components should be implemented as **ViewComponents** instead of `Html.Partial`.
-
 ## Error/Warning Suppression Policy (CRITICAL):
 Any code that suppresses compiler warnings (`#pragma warning disable`, `catch (Exception) {}`) requires:
 1. Explicit approval from human developer.
@@ -52,15 +47,12 @@ Any code that suppresses compiler warnings (`#pragma warning disable`, `catch (E
 ## File Structure
 
 ```
-DotNetMvcWeb/
-├── Controllers/          # MVC Controllers
-├── Models/               # Entity Models, ViewModels, DTOs
-├── Views/                # Razor Views (.cshtml)
-│   ├── Home/
-│   └── Shared/
+DotNetMvcAPI/
+├── Controllers/          # API Controllers (inherit from ControllerBase)
+├── Models/               # Entity Models
+│   └── Dtos/             # Data Transfer Objects
 ├── Services/             # Business Logic & Dependency Injection Services
 ├── Data/                 # EF Core DbContext and Configurations
-├── wwwroot/              # Static files (CSS, JS, images, htmx)
 ├── Resources/            # .resx files for Localization (i18n)
 ├── Program.cs            # Entry point & DI Container configuration
 └── appsettings.json      # Configuration settings

@@ -6,16 +6,15 @@ This file provides repository-wide instructions for GitHub Copilot to ensure con
 
 ## Project Overview
 
-**DotNetMvcWeb** is a comprehensive .NET 9 MVC web application showcasing modern web development practices with C#, Razor, HTMX, and Entity Framework Core.
+**DotNetMvcAPI** is a comprehensive .NET 9/10 Web API application showcasing modern backend development practices with C# and Entity Framework Core.
+This is a pure ASP.NET Core Web API project. It DOES NOT contain Razor Views, HTMX, frontend styles (CSS/SCSS), or static web assets (wwwroot). All outputs are JSON.
 
 ### Tech Stack
 
-- **Framework**: ASP.NET Core MVC (.NET 9)
+- **Framework**: ASP.NET Core Web API (.NET 9/10)
 - **Language**: C# 13 (Nullable Reference Types enabled)
-- **Database**: PostgreSQL with Entity Framework Core (EF Core)
-- **Interactivity**: HTMX (for frontend dynamic behavior)
-- **UI Architecture**: ViewComponents, PartialViews, Razor Pages
-- **Styling**: SCSS (Modified BEM)
+- **Database**: PostgreSQL / SQL Server / Oracle with Entity Framework Core (EF Core)
+- **Architecture**: RESTful API, DTO Pattern, Repository/Service Pattern
 - **Build Tool**: `dotnet` CLI
 
 ---
@@ -34,8 +33,6 @@ You MUST:
 2. **Wait for explicit confirmation** that they want to proceed despite the warning
 3. Only then execute the instruction
 
-This ensures users make informed decisions about potentially risky actions.
-
 ---
 
 ## Core Coding Standards
@@ -47,26 +44,17 @@ This ensures users make informed decisions about potentially risky actions.
 - **Implicit Typing**: Avoid `var` unless the right side makes the type blatantly obvious.
 - **Runtime Validation**: Use `string.IsNullOrEmpty`, `ArgumentNullException.ThrowIfNull`, and pattern matching.
 
-### CSS/SCSS Naming (Modified BEM)
+### RESTful API Design
 
-**Naming Structure**:
+- **Routing**: All API routes MUST start with `api/`, e.g., `[Route("api/[controller]")]`. Use lowercase paths. Use noun-based resource names (e.g., `/api/users`).
+- **HTTP Verbs**: Use GET for retrieval, POST for creation, PUT/PATCH for updates, DELETE for deletion.
+- **Status Codes**: Return standard status codes (200 OK, 201 Created with Location header, 204 No Content, 400 Bad Request, 404 Not Found, etc.). Do not expose raw exception details on 500 errors.
 
-- **Block**: `.countdown` (single word)
-- **Element**: `.countdown-title` (hyphen `-` for hierarchy)
-- **Sub-Element**: `.countdown-title-icon` (hyphen `-` for hierarchy)
-- **Multi-word Segment**: `.image_upload` (underscore `_` separates words **WITHIN** a single segment)
-- **State**: `[data-is-active='true']` (HTML data attributes)
+### DTOs & Response Formats
 
-**Critical Rules**:
-- ❌ NEVER use `__` (double underscore) or `--` (double hyphen)
-- ✅ Use hyphen `-` for structural hierarchy.
-- ✅ Use underscore `_` for multi-word concepts (e.g., `scroll_area`).
-
-### Razor Views & HTMX
-
-- **Interactivity**: Default to **HTMX** attributes (`hx-get`, `hx-post`, `hx-target`) instead of custom Vanilla JS.
-- **ViewComponents**: Use ViewComponents for complex, reusable UI blocks that require backend logic.
-- **PartialViews**: Use PartialViews for simpler UI components. Return `PartialView()` from controllers responding to HTMX requests.
+- **Never Expose Entities**: NEVER use EF Core Entity models as API request or response bodies. Always use dedicated Data Transfer Objects (DTOs).
+- **Naming**: Use names like `CreateUserRequest`, `UpdateUserRequest`, `UserResponse`.
+- **Location**: Place DTOs in the `Models/Dtos/` directory.
 
 ### Entity Framework Core Best Practices
 
@@ -119,18 +107,7 @@ For complex scenarios, refer to detailed rules in `.agent/rules/` or the primary
 | Domain | File Location |
 |---|---|
 | C# Standards | `.agent/rules/csharp-standards.md` |
-| CSS Naming | `.agent/rules/css-naming.md` |
 | Security | `.agent/rules/security-policy.md` |
-| Razor/HTMX | `.agent/rules/mvc-views.md` |
+| REST API Design | `.agent/rules/rest-api-design.md` |
+| DTO & OpenAPI | `.agent/rules/dto-and-openapi.md` |
 | EF Core | `.agent/rules/backend-orm.md` |
-
----
-
-## Path-Specific Instructions
-
-For more detailed, path-specific instructions, see:
-
-- **C#**: `.github/instructions/csharp.instructions.md`
-- **Razor Views**: `.github/instructions/razor.instructions.md`
-- **CSS/SCSS**: `.github/instructions/css.instructions.md`
-- **Backend/Controllers**: `.github/instructions/backend.instructions.md`

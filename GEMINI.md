@@ -1,6 +1,7 @@
-# Project Instructions for Gemini (DotNet MVC)
+# Project Instructions for Gemini (DotNet Web API)
 
 When working on this project, you MUST follow the coding standards defined below.
+This project is a pure ASP.NET Core Web API project. It DOES NOT contain Razor Views, HTMX, frontend styles (CSS/SCSS), or static web assets (wwwroot). All outputs are JSON.
 
 ## ⚠️ Security & Best Practices Warning Policy
 
@@ -30,24 +31,19 @@ This ensures users make informed decisions about potentially risky actions.
 - **Guard Clauses**: Use `ArgumentNullException.ThrowIfNull(obj)` at the start of methods.
 - **Pattern Matching**: Prefer `switch` expressions and pattern matching `if (obj is MyType myObj)` over older casting methods (`as MyType`).
 
-### CSS/SCSS Naming (Modified BEM)
-- **Block**: `.countdown` (Single word)
-- **Element**: `.countdown-title` (hyphen `-` separates Block-Element)
-- **Sub-Element**: `.countdown-title-icon` (hyphen `-` separates Element-SubElement)
-- **Multi-word Segment**: `.image_upload` (underscore `_` separates words **WITHIN** a single segment)
-- **State**: `[data-is-active='true']` (HTML data attribute)
+### RESTful API Design (⚠️ CRITICAL)
+- **Routing**: All API routes MUST start with `api/`, e.g., `[Route("api/[controller]")]`. Use lowercase paths. Use noun-based resource names (e.g., `/api/users`, NOT `/api/getUsers`).
+- **HTTP Verbs**: Use appropriate verbs (GET for retrieval, POST for creation, PUT/PATCH for updates, DELETE for deletion).
+- **Status Codes**: Return standard status codes (200 OK, 201 Created with Location header, 204 No Content, 400 Bad Request, 404 Not Found, etc.). Do not expose raw exception details on 500 errors.
 
-#### 🛑 Critical Disambiguation for Gemini:
-- **Hierarchy (Hyphen `-`)**: Use when adding a new structural level or generic container.
-  - ✅ `.controls-group` (`group` is a sub-element of `controls`)
-- **Multi-word Segment (Underscore `_`)**: Use when the name describes a SINGLE specific concept that happens to need two words.
-  - ✅ `.scroll_area` (A "scroll area" is one specific thing)
+### DTOs & Response Formats (⚠️ CRITICAL)
+- **Never Expose Entities**: NEVER use EF Core Entity models as API request or response bodies. Always use dedicated Data Transfer Objects (DTOs).
+- **Naming**: Use names like `CreateUserRequest`, `UpdateUserRequest`, `UserResponse`.
+- **Location**: Place DTOs in the `Models/Dtos/` directory.
 
-### Razor Views & HTMX (⚠️ CRITICAL)
-- **Interactivity**: Use **HTMX** attributes (`hx-get`, `hx-post`, `hx-target`, `hx-swap`) for interactivity instead of writing custom AJAX/Vanilla JS, unless HTMX cannot solve the problem.
-- **Partial Views**: When returning from a controller for an HTMX request, return `PartialView("_MyComponent")` instead of `View()`.
-- **ViewComponents**: For complex, reusable UI blocks that require backend logic, use ViewComponents (`@await Component.InvokeAsync(...)`) instead of standard PartialViews.
-- **Scripts**: Avoid writing inline `<script>` tags inside Partial Views. Scope scripts appropriately or use HTMX events.
+### OpenAPI & Documentation
+- Ensure all public Controller Actions are documented using XML Comments (`<summary>`, `<param>`, `<returns>`) and `[ProducesResponseType]` to generate complete OpenAPI specs.
+- The OpenAPI JSON and Scalar UI endpoints are ONLY available in the Development environment.
 
 ### Entity Framework Core (EF Core) Best Practices & Deep Check Policy (⚠️ CRITICAL)
 - **Async First**: ALWAYS use async/await methods for database operations (`ToListAsync()`, `FirstOrDefaultAsync()`, `SaveChangesAsync()`). Synchronous DB calls are forbidden.
@@ -73,13 +69,6 @@ When reviewing or refactoring backend code (C# Controllers, Services, Data Acces
 
 **CRITICAL**: If you only perform Round 1 checks, you MUST explicitly state:
 > "⚠️ I have only performed basic checks. EF Core and Memory deep checks are still required."
-
-
-
-### Internationalization (i18n)
-- Use standard `Microsoft.AspNetCore.Mvc.Localization`.
-- Inject `IStringLocalizer<SharedResource>` in Controllers or Services for backend translation.
-- Inject `@inject IViewLocalizer Localizer` in Razor Views (`.cshtml`).
 
 ### Warnings / Lint Suppression Policy (⚠️ CRITICAL)
 - **NEVER** add `#pragma warning disable` or suppress C# compiler warnings without **explicit user instruction**.
@@ -131,27 +120,22 @@ When reviewing or refactoring backend code (C# Controllers, Services, Data Acces
 
 ---
 
-## File Structure & MVC Conventions
+## File Structure & API Conventions
 
-- **Controllers/**: Must inherit from `Controller` (for Views) or `ControllerBase` (for APIs). End class name with `Controller`.
-- **Models/**: Entity classes, ViewModels, and Data Transfer Objects (DTOs).
-- **Views/**: Razor views (`.cshtml`). Must align with Controller names (e.g., `Views/Home/Index.cshtml`).
-- **wwwroot/**: Static assets (CSS, JS, Images, Libs).
+- **Controllers/**: Must inherit from `ControllerBase` and be decorated with `[ApiController]`. End class name with `Controller`.
+- **Models/**: Entity classes.
+- **Models/Dtos/**: Data Transfer Objects (DTOs) for API requests and responses.
 
 For more detailed rules, you MUST review the specific files located in the `.agent/rules/` directory:
 - [csharp-standards.md](.agent/rules/csharp-standards.md): C# Language and Type Safety rules
-- [css-naming.md](.agent/rules/css-naming.md): CSS/SCSS Naming Conventions (BEM)
-- [css-property-order.md](.agent/rules/css-property-order.md): CSS Property Order
+- [rest-api-design.md](.agent/rules/rest-api-design.md): RESTful API route and verb conventions
+- [dto-and-openapi.md](.agent/rules/dto-and-openapi.md): DTO models and OpenAPI generation
 - [runtime-data-validation.md](.agent/rules/runtime-data-validation.md): Runtime Null & Data Validation
-- [security-policy.md](.agent/rules/security-policy.md): Security & XSS/SQLi Policies
+- [security-policy.md](.agent/rules/security-policy.md): Security Policies
 - [i18n.md](.agent/rules/i18n.md): Localization / i18n
 - [build-tools.md](.agent/rules/build-tools.md): .NET Build & Dev Tooling
-- [file-organization.md](.agent/rules/file-organization.md): MVC Architecture & Structure
+- [file-organization.md](.agent/rules/file-organization.md): API Architecture & Structure
 - [lint-policy.md](.agent/rules/lint-policy.md): Warnings & Suppression rules
 - [backend-orm.md](.agent/rules/backend-orm.md): EF Core & Migrations
-- [mvc-views.md](.agent/rules/mvc-views.md): Razor Views & HTMX
-- [inline-styles.md](.agent/rules/inline-styles.md): Inline Styles Policy for Razor
-- [razor-htmx-components.md](.agent/rules/razor-htmx-components.md): ViewComponents vs PartialViews
-- [lazy-loading.md](.agent/rules/lazy-loading.md): HTMX Lazy Loading UI
 - [no-scripts.md](.agent/rules/no-scripts.md): No Bash/Sed Script Refactoring
 - [project-instructions.md](.agent/rules/project-instructions.md): Overall instructions
