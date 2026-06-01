@@ -1,0 +1,16 @@
+name: dot-net-mvc-api
+services:
+  dot-net-mvc-api-mysql:
+    image: mysql:9
+    container_name: dot-net-mvc-api-mysql
+    platform: linux/x86_64 # 關鍵！解決 Apple Silicon 有時遇到的架構相容問題
+    restart: no
+    ports:
+      - "3308:3306" # mysql 預設 port 為 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456789
+      MYSQL_DATABASE: dot_net_mvc_web_db
+      MYSQL_USER: dot-net-mvc-api
+      MYSQL_PASSWORD: DotNetMvcApiAbc123
+    volumes:
+      - ./data:/var/lib/mysql

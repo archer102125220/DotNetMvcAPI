@@ -480,3 +480,8 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+#docker-DB-Data
+docker/*/data/*
+docker/*/mssql_data/*
+docker/*/pg_data/*
